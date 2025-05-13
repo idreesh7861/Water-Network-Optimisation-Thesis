@@ -1,0 +1,30 @@
+%!TEX root = ../thesis.tex
+%*******************************************************************************
+%****************************** Sixth Chapter **********************************
+%*******************************************************************************
+\chapter{Conclusion}\label{conclusion}
+
+% **************************** Define Graphics Path **************************
+\ifpdf
+    \graphicspath{{Chapter6/Figs/Raster/}{Chapter6/Figs/PDF/}{Chapter6/Figs/}}
+\else
+    \graphicspath{{Chapter6/Figs/Vector/}{Chapter6/Figs/}}
+\fi
+\section{Summary}
+The project's aim was to set out to develop a scalable and interactive optimisation tool for the design of water distribution networks and this was achieved. Software to calculate the most optimal solution for piping water utilities in a given area was successfully developed.
+
+The analysis of existing software solutions was performed. Additionally, the problem was identified as NP-Complete and mathematically formulated before being implemented using Gurobi. All of the functional and non-functional requirements were met in whole with the exception of a single requirement which was only partly satisfied.
+
+While the system performs well in moderately sized networks, the scalability analysis has revealed computational challenges as the number of nodes and complexity increases. This serves as both a limitation and an opportunity: the current solver provides a solid foundation, but future iterations could consider techniques such as parallelised optimisation to improve performance at scale.
+
+In summary, the work accomplished in this dissertation provides a promising and practical step toward automated infrastructure planning. It showcases how computational optimisation, when paired with user-centric design, can significantly streamline the process of water network layout. The foundation laid here opens up numerous avenues for refinement and real-world deployment.
+
+\section{Future Work}
+
+If work on this project were to continue, there exists a plethora of directions in which this program could be taken as the research has opened up many areas for improvement and expansion. Firstly, the implementation of different piping types could be introduced. Rather than pipes having no limits to their pressure as exists within the current implementation, it would be possible to add the functionality of different pipes to the program. This would, in theory, include pipes of different material and size, each with their own corresponding pressure limit and cost. In practise, this would mean that a single piping network could include different types of pipes integrated together. This would make the application more adaptable and appropriate for real-life purposes.\newline
+The program could also be adapted to consider regulatory compliance. This would be integrated by simply changing the constraints or adding new constraints to force the piping routes to abide by regulatory rules. Taking this idea further, the program could possibly be adaptable for different regulatory rules which vary from country to country. This would mean having something like a drop-down list that could change the set of constraints that the optimiser is abiding by from, for example, the rules of the U.S.A. to the rules of the U.K. Expanding further on this idea, it may be required to create new "classes" of buildings such as commercial, residential, or industrial as, under some regulations, these building types will have different regulations to abide by.\newline
+An option to import and export the data provided could also be a quality-of-life\footnote{A phrase used metaphorically in software development to describe features that enhance usability, efficiency, or user experience.} feature considered for implementation in the future. This would mean having a standardised data form by which node and edge data could be imported and exported. Options could also be provided  for exporting the output to a PNG or an industry-standard file format for water distribution system planning.\newline
+Another quality-of-life feature that could be considered for inclusion is dedicated map controls, This would mean providing the option to zoom, pan or scale the map as the user sees fit and possibly overlaying some form of grid onto the map such that it is possible to gauge distance between nodes when placing them.\newline
+Expanding the program to consider altitude (the $y$ axis) as well as just $x$ and $z$ locations of buildings is another option. This would require a large overhaul of the program however as it may be required to model whole terrains as opposed to just the nodes on a graph and may be better suited for a wider engine such as Unity.\newline
+A quality-of-life feature that could absolutely be included is a persistent label in the GUI displaying the current optimiser status. For example, if the optimiser was running, stopped, or initialising.\newline
+The final item that could be considered is different factors other than pressure. This could mean flow rate\footnote{Affects supply efficiency and pipe sizing.}, velocity\footnote{Needs to be within an optimal range to prevent sedimentation or erosion.} or head loss\footnote{Caused by friction and elevation changes.} being considered and required to be met as well as pressure.

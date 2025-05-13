@@ -1,35 +1,151 @@
 %!TEX root = ../thesis.tex
 % ******************************* Thesis Appendix A ****************************
-\chapter{Installation}
+\chapter{AppendStatus Code Exert}\label{app:appendStatus}
+\begin{lstlisting}
+public static String getTimestamp() {
+    return "[" + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + "]";
+}
 
-\section*{Debian/Ubuntu}
+public static void appendStatus(String message){
+    if (statusArea != null){
+        statusArea.append(getTimestamp() + message + "\n");
+        statusArea.setCaretPosition(statusArea.getDocument().getLength()); // Auto-scroll to bottom
+    }
+}
+\end{lstlisting}
+\chapter{Callback Code Exert}\label{app:callback_code}
 
-\subsection*{Usage}
-\begin{enumerate}
-\item Install Latex and Editor (Texmaker) \\
-\begin{verbatim} 
-	sudo apt-get install texlive texlive-latex-extra texlive-science psutils texmaker
-\end{verbatim}
-\item Clone this repo to a folder and open in editor.
-\end{enumerate}
-\subsection*{Developing}
-\begin{enumerate}
-\item Install IDE (Visual Studio Code) \\
-\item \begin{verbatim} 
-sudo add-apt-repository ppa:ubuntu-desktop/ubuntu-make
-sudo apt-get update
-sudo apt-get install ubuntu-make
-umake ide visual-studio-code
-\end{verbatim}
-\item Install Latex\\
-\begin{verbatim} 
-		sudo apt-get install texlive texlive-latex-extra texlive-science psutils
-\end{verbatim}
-\item Clone this repo to a folder and open in IDE.
-\item Add LaTex Workshop extension.
-\item Build (Ctrl-Alt-B) and view generated 'thesis.pdf' file.
-\item Make source code alteration and a pull request to contribute.
-\end{enumerate}
+\begin{lstlisting}
+@Override
+protected void callback() {
+    try {
+        if (where == GRB.CB_MIPSOL) { // New feasible solution found
+            List<int[]> newConnections = new ArrayList<>();
+
+            // Get the current objective value
+            double currentObjectiveValue = getDoubleInfo(GRB.CB_MIPSOL_OBJBST);
+
+            // Only update if the new objective value is better than the best found so far
+            if (currentObjectiveValue < bestObjectiveValue) {
+                bestObjectiveValue = currentObjectiveValue; // Update the best objective value
+
+                // Update the connections with the current best solution
+                for (int i = 0; i < N; i++) {
+                    for (int j = 0; j < N; j++) {
+                        if (n[i][j] != null) {
+                            double val = getSolution(n[i][j]);
+                            if (val > 0.5) {
+                                newConnections.add(new int[]{i, j});
+                            }
+                        }
+                    }
+                }
+
+                synchronized (GurobiFlowModel.lock) {
+                    GurobiFlowModel.activeConnections = newConnections; // Update the connections
+                    GurobiFlowModel.appendStatus(" New best solution found! Objective: " + currentObjectiveValue);
+                }
+
+                SwingUtilities.invokeLater(() -> {
+                    if (GurobiFlowModel.canvasReference != null) {
+                        GurobiFlowModel.canvasReference.repaint(); // Repaint UI
+                    }
+                });
+            }
+        }
+
+        if (where == GRB.CB_MIP) { // Progress info
+            double objBest = getDoubleInfo(GRB.CB_MIP_OBJBST);
+            double objBound = getDoubleInfo(GRB.CB_MIP_OBJBND);
+            double gap = (objBest - objBound) / objBest;
+
+            synchronized (GurobiFlowModel.lock) {
+                GurobiFlowModel.appendStatus(
+                        String.format("Best obj: %.2f | Bound: %.2f | Gap: %.2f%%",
+                        objBest, objBound, gap * 100)
+                );
+            }
+        }
+    } catch (GRBException e) {
+        e.printStackTrace();
+    }
+}
+\end{lstlisting}
+
+\chapter{System Information}\label{app:sysinfo}
+\begin{lstlisting}
+[System Summary]
+
+Item	Value	
+OS Name	Microsoft Windows 11 Pro	
+Version	10.0.22631 Build 22631	
+Other OS Description 	Not Available	
+OS Manufacturer	Microsoft Corporation	
+System Name	IFRAMEWORK	
+System Manufacturer	Framework	
+System Model	Laptop (13th Gen Intel Core)	
+System Type	x64-based PC	
+System SKU	FRANDECP04	
+Processor	13th Gen Intel(R) Core(TM) i5-1340P, 1900 Mhz, 12 Core(s), 16 Logical Processor(s)	
+BIOS Version/Date	INSYDE Corp. 03.04, 24/05/2023	
+SMBIOS Version	3.4	
+Embedded Controller Version	255.255	
+BIOS Mode	UEFI	
+BaseBoard Manufacturer	Framework	
+BaseBoard Product	FRANMCCP04	
+BaseBoard Version	A4	
+Platform Role	Mobile	
+Secure Boot State	On	
+Windows Directory	C:/Windows	
+System Directory	C:/Windows/system32	
+Boot Device	/Device/HarddiskVolume1	
+Locale	United Kingdom	
+Hardware Abstraction Layer	Version = "10.0.22621.2506"	
+Username	iFramework/gamin	
+Time Zone	GMT Summer Time	
+Installed Physical Memory (RAM)	16.0 GB	
+Total Physical Memory	15.7 GB	
+Total Virtual Memory	35.5 GB	
+Page File Space	19.8 GB	
+Page File	C:/pagefile.sys	
+Kernel DMA Protection	On	
+Virtualisation-based security	Running	
+
+[Display]
+
+Item	Value	
+Name	Solstice Graphics Adapter	
+PNP Device ID	ROOT/DISPLAY/0000	
+Adapter Type	Not Available, Mersive compatible	
+Adapter Description	Solstice Graphics Adapter	
+Adapter RAM	Not Available	
+Installed Drivers	Not Available	
+Driver Version	1.1.185.68	
+INF File	oem90.inf (v3DDKIndirect_1.2_Install.NT section)	
+Colour Planes	Not Available	
+Colour Table Entries	Not Available	
+Resolution	Not Available	
+Bits/Pixel	Not Available	
+Driver	C:/WINDOWS/SYSTEM32/DRIVERS/WUDFRD.SYS (10.0.22621.4391, 344.00 KB (352,256 bytes), 26/11/2024 16:06)	
+		
+Name	Intel(R) UHD Graphics	
+PNP Device ID	PCI/VEN_8086&DEV_A720&SUBSYS_0003F111&REV_04/3&11583659&0&10	
+Adapter Type	Intel(R) UHD Graphics Family, Intel Corporation compatible	
+Adapter Description	Intel(R) UHD Graphics	
+Adapter RAM	2.00 GB (2,147,479,552 bytes)	
+Installed Drivers	C:/Windows/System32/DriverStore/FileRepository/iigd_dch.inf_amd64_036aca5c7729dd8d/igdumdim64.dll,C:/Windows/System32/DriverStore/FileRepository/iigd_dch.inf_amd64_036aca5c7729dd8d/igd10iumd64.dll,C:/Windows/System32/DriverStore/FileRepository/iigd_dch.inf_amd64_036aca5c7729dd8d/igd10iumd64.dll,C:/Windows/System32/DriverStore/FileRepository/iigd_dch.inf_amd64_036aca5c7729dd8d/igd12umd64.dll	
+Driver Version	32.0.101.6129	
+INF File	oem14.inf (iRPLPD_w10_DS section)	
+Colour Planes	Not Available	
+Colour Table Entries	4294967296	
+Resolution	2256 x 1504 x 59 hertz	
+Bits/Pixel	32	
+Memory Address	0x5C000000-0x5CFFFFFF	
+Memory Address	0x0000-0xFFFFFFF	
+I/O Port	0x00003000-0x0000303F	
+IRQ Channel	IRQ 4294967240	
+Driver	C:/WINDOWS/SYSTEM32/DRIVERSTORE/FILEREPOSITORY/IIGD_DCH.INF_AMD64_036ACA5C7729DD8D/IGDKMDN64.SYS (32.0.101.6129, 51.50 MB (54,000,544 bytes), 12/12/2024 18:48)
+\end{lstlisting}
 
 
 
